@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static com.example.aivle.global.response.ErrorCode.*;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
 
@@ -36,10 +36,16 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public LoginResponse login(LoginRequest request) {
-        Member member = memberRepository.findByLoginId(request.loginId()).orElseThrow(() -> new CustomException(NOT_FOUND_LOGINID));
+        Member member = memberRepository.findByLoginId(request.loginId()).orElseThrow(() -> new CustomException(NOT_FOUND_MEMBER));
         if (!member.getPassword().equals(request.password())) {
             throw new CustomException(INVALID_PASSWORD);
         }
         return new LoginResponse(member.getId());
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Member findMember(Integer memberId) {
+        return memberRepository.findById(memberId).orElseThrow(() -> new CustomException(NOT_FOUND_MEMBER));
     }
 }
