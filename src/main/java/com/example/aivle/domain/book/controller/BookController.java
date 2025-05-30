@@ -33,7 +33,7 @@ public class BookController {
         String url = coverService.generateCover(req);
         return ResponseEntity.ok(CoverResponse.ok(url));
     }
-}
+
 
     @GetMapping("/{bookId}")
     public Response<BookResponse> getBookDetails(@PathVariable Integer bookId) {
@@ -64,5 +64,4 @@ public class BookController {
         bookService.deleteBook(bookId, session);
         return Response.success();
     }
-
 }
