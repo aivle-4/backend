@@ -14,14 +14,28 @@ public class Book extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
 
+    private Integer id;
     private String title;
     private String author;
     private String content;
+
+    @Column(length = 2048)  // 글자수 제한 오류 수정
     private String coverImageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    public Book(String title, String content) {
+        super();
+    }
+
+    public static Book of(String title, String content) {
+        return new Book(title, content);
+    }
+
+    public void attachCover(String url) {
+        this.coverImageUrl = url;
+    }
 }
