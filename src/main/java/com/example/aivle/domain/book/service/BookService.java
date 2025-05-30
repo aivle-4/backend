@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface BookService {
 
-    List<BookSummaryResponse> searchBooks(String keyword);
+    List<BookSummaryResponse> findBooks(String keyword);
 }

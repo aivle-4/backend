@@ -6,5 +6,5 @@ import com.example.aivle.domain.member.dto.LoginResponse;
 public interface MemberService {
 
     LoginResponse signup(LoginRequest loginRequest);
-
+    LoginResponse login(LoginRequest loginRequest);
 }

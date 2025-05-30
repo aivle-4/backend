@@ -23,4 +23,10 @@ public class MemberController {
         LoginResponse response = memberService.signup(request);
         return Response.success(response);
     }
+
+    @PostMapping("/login")
+    public Response<LoginResponse> login(@RequestBody @Valid LoginRequest request) {
+        LoginResponse response = memberService.login(request);
+        return Response.success(response);
+    }
 }

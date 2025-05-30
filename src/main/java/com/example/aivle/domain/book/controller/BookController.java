@@ -18,9 +18,9 @@ public class BookController {
 
     private final BookService bookService;
 
-    @GetMapping("/search")
-    public Response<List<BookSummaryResponse>> searchBooks(@RequestParam String keyword) {
-        List<BookSummaryResponse> response = bookService.searchBooks(keyword);
+    @GetMapping
+    public Response<List<BookSummaryResponse>> searchBooks(@RequestParam(defaultValue = "") String keyword) {
+        List<BookSummaryResponse> response = bookService.findBooks(keyword);
         return Response.success(response);
     }
 }

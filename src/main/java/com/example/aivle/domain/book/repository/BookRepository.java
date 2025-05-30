@@ -10,11 +10,11 @@ import java.util.List;
 public interface BookRepository extends JpaRepository<Book, Integer> {
 
     @Query("""
-                SELECT b
-                FROM Book b
-                JOIN b.author a
-                WHERE LOWER(b.title)   LIKE LOWER(CONCAT('%', :kw, '%'))
-                   OR LOWER(a.name)    LIKE LOWER(CONCAT('%', :kw, '%'))
-            """)
+        SELECT b
+        FROM Book b
+        WHERE LOWER(b.title)  LIKE LOWER(CONCAT('%', :kw, '%'))
+           OR LOWER(b.author) LIKE LOWER(CONCAT('%', :kw, '%'))
+    """)
     List<Book> searchByKeyword(@Param("kw") String keyword);
 }
+

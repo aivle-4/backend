@@ -18,7 +18,7 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
 
     @Override
-    public List<BookSummaryResponse> searchBooks(String keyword) {
+    public List<BookSummaryResponse> findBooks(String keyword) {
         List<Book> books = bookRepository.searchByKeyword(keyword);
         return books.stream().map(BookSummaryResponse::from).collect(Collectors.toList());
     }
