@@ -14,8 +14,8 @@ public class Book extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private Integer id;
+
     private String title;
     private String author;
     private String content;
@@ -26,6 +26,13 @@ public class Book extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    public void update(String title, String author, String content, String coverImageUrl) {
+        this.title = title;
+        this.author = author;
+        this.content = content;
+        this.coverImageUrl = coverImageUrl;
+    }
 
     public Book(String title, String content) {
         super();
