@@ -1,21 +1,13 @@
 package com.example.aivle.domain.book.controller;
 
-import com.example.aivle.domain.book.dto.CoverRequest;
-import com.example.aivle.domain.book.dto.CoverResponse;
-import com.example.aivle.domain.book.dto.BookRequest;
-import com.example.aivle.domain.book.dto.BookResponse;
-import com.example.aivle.domain.book.dto.BookSummaryResponse;
+import com.example.aivle.domain.book.dto.*;
 import com.example.aivle.domain.book.service.BookService;
 import com.example.aivle.domain.book.service.CoverService;
-import jakarta.validation.Valid;
 import com.example.aivle.global.response.Response;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,7 +25,6 @@ public class BookController {
         String url = coverService.generateCover(req);
         return ResponseEntity.ok(CoverResponse.ok(url));
     }
-
 
     @GetMapping("/{bookId}")
     public Response<BookResponse> getBookDetails(@PathVariable Integer bookId) {
@@ -64,4 +55,5 @@ public class BookController {
         bookService.deleteBook(bookId, session);
         return Response.success();
     }
+
 }
