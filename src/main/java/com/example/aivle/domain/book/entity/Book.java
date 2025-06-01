@@ -19,6 +19,8 @@ public class Book extends BaseEntity {
     private String title;
     private String author;
     private String content;
+
+    @Column(length = 2048)  // 글자수 제한 오류 수정
     private String coverImageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -30,5 +32,17 @@ public class Book extends BaseEntity {
         this.author = author;
         this.content = content;
         this.coverImageUrl = coverImageUrl;
+    }
+
+    public Book(String title, String content) {
+        super();
+    }
+
+    public static Book of(String title, String content) {
+        return new Book(title, content);
+    }
+
+    public void attachCover(String url) {
+        this.coverImageUrl = url;
     }
 }

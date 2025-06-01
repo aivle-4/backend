@@ -23,3 +23,10 @@ spring:
         use_sql_comments: true
         default_batch_fetch_size: 1000
     open-in-view: false
+
+# api-key 부분에 따옴표 없이 발급 받은 api key 넣으시면 됩니다
+openai:
+  api-key:
+  image:
+    model: dall-e-2
+    size: 1024x1024
