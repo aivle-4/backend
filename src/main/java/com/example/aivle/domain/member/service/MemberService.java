@@ -10,5 +10,5 @@ public interface MemberService {
 
     LoginResponse login(LoginRequest request);
 
-    Member findMember(Integer memberId);
+    Member findMember();
 }

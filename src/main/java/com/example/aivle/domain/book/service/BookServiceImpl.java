@@ -3,12 +3,13 @@ package com.example.aivle.domain.book.service;
 import com.example.aivle.domain.book.dto.BookRequest;
 import com.example.aivle.domain.book.dto.BookResponse;
 import com.example.aivle.domain.book.dto.BookSummaryResponse;
+import com.example.aivle.domain.book.dto.CoverRequest;
 import com.example.aivle.domain.book.entity.Book;
 import com.example.aivle.domain.book.repository.BookRepository;
 import com.example.aivle.domain.member.entity.Member;
 import com.example.aivle.domain.member.service.MemberService;
+import com.example.aivle.global.openai.AiCoverClient;
 import com.example.aivle.global.response.CustomException;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
     private final MemberService memberService;
+    private final AiCoverClient aiCoverClient;
 
     @Transactional(readOnly = true)
     @Override
@@ -42,9 +44,8 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookResponse addBook(BookRequest bookRequest, HttpSession session) {
-        Integer memberId = (Integer) session.getAttribute("memberId");
-        Member member = memberService.findMember(memberId);
+    public BookResponse addBook(BookRequest bookRequest) {
+        Member member = memberService.findMember();
 
         Book book = Book.builder()
                 .member(member)
@@ -59,8 +60,8 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookResponse updateBook(Integer bookId, BookRequest request, HttpSession session) {
-        Integer memberId = (Integer) session.getAttribute("memberId");
+    public BookResponse updateBook(Integer bookId, BookRequest request) {
+        Integer memberId = memberService.findMember().getId();
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new CustomException(NOT_FOUND_BOOK));
 
         if (!book.getMember().getId().equals(memberId)) {
@@ -73,8 +74,8 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public void deleteBook(Integer bookId, HttpSession session) {
-        Integer memberId = (Integer) session.getAttribute("memberId");
+    public void deleteBook(Integer bookId) {
+        Integer memberId = memberService.findMember().getId();
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new CustomException(NOT_FOUND_BOOK));
 
         if (!book.getMember().getId().equals(memberId)) {
@@ -82,5 +83,10 @@ public class BookServiceImpl implements BookService {
         }
 
         bookRepository.delete(book);
+    }
+
+    @Override
+    public String generateCover(CoverRequest req) {
+        return aiCoverClient.createCover(req.title(), req.content());
     }
 }

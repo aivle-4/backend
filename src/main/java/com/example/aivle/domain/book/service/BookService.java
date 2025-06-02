@@ -3,6 +3,7 @@ package com.example.aivle.domain.book.service;
 import com.example.aivle.domain.book.dto.BookRequest;
 import com.example.aivle.domain.book.dto.BookResponse;
 import com.example.aivle.domain.book.dto.BookSummaryResponse;
+import com.example.aivle.domain.book.dto.CoverRequest;
 import jakarta.servlet.http.HttpSession;
 
 import java.util.List;
@@ -16,11 +17,14 @@ public interface BookService {
     List<BookSummaryResponse> findBooks(String keyword);
 
     // 도서 추가
-    BookResponse addBook(BookRequest request, HttpSession session);
+    BookResponse addBook(BookRequest request);
 
     // 도서 수정
-    BookResponse updateBook(Integer bookId, BookRequest request, HttpSession session);
+    BookResponse updateBook(Integer bookId, BookRequest request);
 
     // 도서 삭제
-    void deleteBook(Integer bookId, HttpSession session);
+    void deleteBook(Integer bookId);
+
+    // 커버 생성
+    String generateCover(CoverRequest req);
 }

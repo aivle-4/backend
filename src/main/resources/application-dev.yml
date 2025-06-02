@@ -4,7 +4,7 @@ spring:
 
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb;
+    url: jdbc:h2:file:/home/ubuntu/testdb;AUTO_SERVER=true
     username: sa
     password:
 
@@ -12,10 +12,12 @@ spring:
     console:
       enabled: true
       path: /h2-console
+      settings:
+        web-allow-others: true
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         show_sql: true
@@ -24,9 +26,11 @@ spring:
         default_batch_fetch_size: 1000
     open-in-view: false
 
-# api-key 부분에 따옴표 없이 발급 받은 api key 넣으시면 됩니다
-openai:
-  api-key:
-  image:
-    model: dall-e-2
-    size: 1024x1024
+jwt:
+  secret: sGk+uV5U3Pf1zThwZp5z+3Qyx4mJmT5L5xk+hOiZfqE=
+
+#openai:
+#  api-key:
+#  image:
+#    model: dall-e-2
+#    size: 1024x1024

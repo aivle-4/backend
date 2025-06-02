@@ -1,13 +1,6 @@
 package com.example.aivle.domain.book.dto;
 
 public record CoverResponse(
-        boolean isSuccess,
-        String message,
-        Result result
+        String coverImageUrl
 ) {
-    public record Result(String coverImageUrl) {}
-
-    public static CoverResponse ok(String url) {
-        return new CoverResponse(true, "성공입니다.", new Result(url));
-    }
 }

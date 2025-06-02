@@ -33,16 +33,4 @@ public class Book extends BaseEntity {
         this.content = content;
         this.coverImageUrl = coverImageUrl;
     }
-
-    public Book(String title, String content) {
-        super();
-    }
-
-    public static Book of(String title, String content) {
-        return new Book(title, content);
-    }
-
-    public void attachCover(String url) {
-        this.coverImageUrl = url;
-    }
 }

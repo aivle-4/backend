@@ -2,12 +2,9 @@ package com.example.aivle.domain.book.controller;
 
 import com.example.aivle.domain.book.dto.*;
 import com.example.aivle.domain.book.service.BookService;
-import com.example.aivle.domain.book.service.CoverService;
 import com.example.aivle.global.response.Response;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,12 +15,11 @@ import java.util.List;
 public class BookController {
 
     private final BookService bookService;
-    private final CoverService coverService;
 
     @PostMapping("/cover")
-    public ResponseEntity<CoverResponse> createCover(@Valid @RequestBody CoverRequest req) {
-        String url = coverService.generateCover(req);
-        return ResponseEntity.ok(CoverResponse.ok(url));
+    public Response<CoverResponse> createCover(@Valid @RequestBody CoverRequest req) {
+        String url = bookService.generateCover(req);
+        return Response.success(new CoverResponse(url));
     }
 
     @GetMapping("/{bookId}")
@@ -39,20 +35,20 @@ public class BookController {
     }
 
     @PostMapping
-    public Response<BookResponse> createBook(@RequestBody BookRequest request, HttpSession session) {
-        BookResponse response = bookService.addBook(request, session);
+    public Response<BookResponse> createBook(@RequestBody BookRequest request) {
+        BookResponse response = bookService.addBook(request);
         return Response.success(response);
     }
 
     @PutMapping("/{bookId}")
-    public Response<BookResponse> updateBook(@PathVariable Integer bookId, @RequestBody BookRequest request, HttpSession session) {
-        BookResponse response = bookService.updateBook(bookId, request, session);
+    public Response<BookResponse> updateBook(@PathVariable Integer bookId, @RequestBody BookRequest request) {
+        BookResponse response = bookService.updateBook(bookId, request);
         return Response.success(response);
     }
 
     @DeleteMapping("/{bookId}")
-    public Response<Void> deleteBook(@PathVariable Integer bookId, HttpSession session) {
-        bookService.deleteBook(bookId, session);
+    public Response<Void> deleteBook(@PathVariable Integer bookId) {
+        bookService.deleteBook(bookId);
         return Response.success();
     }
 
