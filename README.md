@@ -73,6 +73,7 @@ JpaRepository<Book, Integer>
 책 제목과 내용을 기반으로 AI 커버 이미지를 생성.
 -generateCover(CoverRequest): 표지 이미지 생성
 
+## Domain/member
 ### member/controller/MemberController.java
 회원 관련 API를 제공합니다.
 
@@ -93,6 +94,7 @@ signup(LoginRequest): 중복 로그인 ID 검사 후 회원 등록
 login(LoginRequest): 로그인 ID, 비밀번호 확인
 findMember(Integer memberId): ID로 회원 조회
 
+## Global
 ### base/entity/BaseEntity.java
 공통적으로 사용하는 베이스 엔티티 클래스입니다.
 @CreatedDate와 @LastModifiedDate를 통해 생성일자, 수정일자 자동 관리.
