@@ -1,11 +1,14 @@
-# backend
-
 # 📚 AIVLE Book Service
 
 **Spring Boot 3 + JPA + WebFlux + H2** 로 구현한 간단한 “책 공유 플랫폼” 백엔드입니다.  
 회원 인증부터 책 CRUD, 그리고 OpenAI Images API를 이용한 **자동 표지 생성** 기능까지 포함되어 있습니다.
 
----
+</br>
+
+## 📍 아키텍쳐 
+![Image](https://github.com/user-attachments/assets/37df8092-0192-4842-a479-030979f8fe20)
+
+</br>
 
 ## 🌟 제공 기능
 
@@ -28,119 +31,21 @@
 > }
 > ```
 
----
-## 🖥️ 세부 코드
-## domain/book
-도서(Book) 도메인 관련 기능을 담당합니다.
-도서 등록, 조회, 수정, 삭제 및 표지 이미지 생성을 제공합니다.
+</br>
 
-### controller/BookController.java
-도서 관련 API를 제공합니다.
-도서 등록 (addBook)
-도서 조회 (findBook, findBooks)
-도서 수정 (updateBook)
-도서 삭제 (deleteBook)
-도서 표지 생성 (generateCover)
+## 🔧 기술 스택
 
-### controller/dto
-- BookRequest.java
-도서 등록/수정 요청 DTO (제목, 저자, 내용, 표지 이미지 URL)
-- BookResponse.java
-도서 상세 조회 응답 DTO (도서 ID, 회원 ID, 제목, 저자, 내용, 등록일자, 수정일자)
-- BookSummaryResponse.java
-도서 목록 조회 응답 DTO (도서 ID, 제목, 저자, 등록일자, 표지 이미지 URL)
-- CoverRequest.java
-표지 이미지 생성을 위한 제목 및 내용 요청 DTO
-- CoverResponse.java
-표지 이미지 생성 결과 DTO (성공 여부, 메시지, 이미지 URL)
+- **언어**: Java 17
+- **프레임워크**: Spring Boot 3.x
+  - Spring Web, Spring WebFlux (WebClient), Spring Data JPA, Spring Security (JWT)
+- **데이터베이스**: H2 
+- **빌드 도구**: Gradle
+- **사용 라이브러리**:
+  - OpenAI Images API 연동 → Spring WebFlux(WebClient), Jackson
+  - JWT 발급/검증 → spring-security-jwt
+- **운영 환경**: AWS EC2
 
-### entity/Book.java
-도서 엔티티. 제목, 저자, 내용, 표지 이미지 URL과 작성자(회원) 연관관계 포함.
-
-### repository/BookRepository.java
-JpaRepository<Book, Integer>
-키워드(제목, 저자명) 기반 도서 검색 지원
-
-### service/BookService.java & BookServiceImpl.java
-도서 등록, 조회, 수정, 삭제 비즈니스 로직.
-  -findBook(Integer bookId): 도서 단건 조회
-  -findBooks(String keyword): 도서 리스트 조회
-  -addBook(BookRequest, HttpSession): 도서 등록
-  -updateBook(Integer bookId, BookRequest, HttpSession): 도서 수정 (본인만 가능)
-  -deleteBook(Integer bookId, HttpSession): 도서 삭제 (본인만 가능)
-
-### service/CoverService.java & CoverServiceImpl.java
-책 제목과 내용을 기반으로 AI 커버 이미지를 생성.
--generateCover(CoverRequest): 표지 이미지 생성
-
-## Domain/member
-### member/controller/MemberController.java
-회원 관련 API를 제공합니다.
-
-### member/dto/LoginRequest.java & LoginResponse.java
-회원 가입/로그인 요청 DTO (로그인 ID, 비밀번호)
-회원 가입/로그인 응답 DTO (회원 ID)
-
-### member/entity/Member.java
-회원 엔티티. 로그인 ID, 비밀번호, 생성일자, 수정일자 관리.
-
-### mamber/repository/MemberRepository.java
-JpaRepository<Member, Integer>
-findByLoginId(String loginId): 로그인 ID로 회원 조회
-
-### member/service/MemberService.java & MemberServiceImpl.java
-회원 가입 및 로그인 로직.
-signup(LoginRequest): 중복 로그인 ID 검사 후 회원 등록
-login(LoginRequest): 로그인 ID, 비밀번호 확인
-findMember(Integer memberId): ID로 회원 조회
-
-## Global
-### base/entity/BaseEntity.java
-공통적으로 사용하는 베이스 엔티티 클래스입니다.
-@CreatedDate와 @LastModifiedDate를 통해 생성일자, 수정일자 자동 관리.
-
-### openai/AiCoverClient.java
-- 역할 : 제목·내용을 받아 OpenAI Images API(POST /v1/images/generations)를 호출하고, 생성된 표지 이미지 URL을 돌려줌.
-- 주요 흐름
-  1. WebClient 초기화 — Bearer {API-KEY} 헤더 자동 포함.
-  2.  프롬프트 빌드 → 모델(dall-e-2), 크기(1024×1024)와 함께 JSON 요청 전송.
-  3. 응답 JSON data[0].url 추출 후 반환.
-- 내부 DTO : OpenAiImageRequest, OpenAiImageResponse (record)로 직렬화/역직렬화.
-- 의존성 : Spring WebFlux(WebClient) ‧ Jackson.
-
-### global/response
-| 파일                   | 역할                             | 주요 포인트                             |
-|----------------------|--------------------------------|------------------------------------|
-| CustomException.java | 모든 도메인 예외의 공통 부모 | ErrorCode, message 보관 및 신규 예외 추가   |
-| GlobalExceptionHandler.java      | 전역 예외 처리기 (@RestControllerAdvice)	       | 검증오류, CustomException 등 공통 핸들링     |
-| Response.java                 | API 표준 래퍼    | success() / error() 팩토리 메서드로 간편 생성 |
-| SuccessCode.java                  | 성공 메시지 사전 (enum)	     | OK(200, "성공입니다") -> 모든 성공 응답에서 재사용 |
-| ErrorCode.java              | 기능별 오류 사전 (enum)      | 각 항목 = HTTP 상태 + 기본 메시지            |
-
-
----
-
-
-## 🔑 API Key / 오류 처리
-| 상태  | 예외                              | 설명                     |
-|-----|---------------------------------|------------------------|
-| 400 | `UnsupportedParameterException` | 모델·사이즈 등 지원되지 않는 파라미터  |
-| 401 | `InvalidApiKeyException`        | 잘못된 / 누락된 OpenAIAPI 키 |
-| 403 | `OrganizationAuthException`     | 조직(Org) 권한 부족          |
-| 5XX | `CoverGenerationException`      | 네트워크·타임아웃 등 기타 표지 생성 실패                     |
-
-
----
-
-## 🏗️ 기술 스택
-
-- **Java 17**, **Spring Boot 3.5.0**
-- **Spring Data JPA (Hibernate 6)** — H2 인메모리 DB
-- **Spring WebFlux WebClient** — OpenAI 호출
-- **Lombok**, **MapStruct**, **Jakarta Validation**
-- **Gradle**
-
----
+</br>
 
 ## ⚙️ 환경 설정
 
@@ -148,14 +53,256 @@ findMember(Integer memberId): ID로 회원 조회
 
 ```yaml
 spring:
+  jackson:
+    time-zone: Asia/Seoul
+
   datasource:
-    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;
+    username: sa
+    password: ********
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+        default_batch_fetch_size: 1000
+    open-in-view: false
+
+jwt:
+  secret: sGk+***************************
 
 openai:
-  api-key: sk-************************               
+  api-key: sk-**************************
   image:
     model: dall-e-2
     size: 1024x1024
+```
+
+</br>
+
+## 📁 프로젝트 구조
+```
+└── main
+    ├── java
+    │   └── com.example.aivle
+    │       ├── AivleApplication.java                 // 메인 애플리케이션 클래스
+    │       ├── domain
+    │       │   └── book
+    │       │       ├── controller
+    │       │       │   └── BookController.java        // 도서 API 엔드포인트
+    │       │       ├── dto
+    │       │       │   ├── BookRequest.java            // 도서 등록/수정 요청 DTO
+    │       │       │   ├── BookResponse.java           // 도서 상세 조회 응답 DTO
+    │       │       │   ├── BookSummaryResponse.java    // 도서 목록 조회 응답 DTO
+    │       │       │   ├── CoverRequest.java           // 표지 생성 요청 DTO
+    │       │       │   └── CoverResponse.java          // 표지 생성 응답 DTO
+    │       │       ├── entity
+    │       │       │   └── Book.java                   // 도서 엔티티
+    │       │       ├── repository
+    │       │       │   └── BookRepository.java         // JpaRepository<Book, Integer>
+    │       │       └── service
+    │       │           ├── BookService.java            // 도서 서비스 인터페이스
+    │       │           └── BookServiceImpl.java        // 도서 서비스 구현체
+    │       ├── member
+    │       │   ├── presentation
+    │       │   │   └── MemberController.java           // 회원 API 엔드포인트
+    │       │   ├── dto
+    │       │   │   ├── LoginRequest.java               // 회원 가입/로그인 요청 DTO
+    │       │   │   └── LoginResponse.java              // 회원 가입/로그인 응답 DTO
+    │       │   ├── entity
+    │       │   │   └── Member.java                     // 회원 엔티티
+    │       │   ├── repository
+    │       │   │   └── MemberRepository.java           // JpaRepository<Member, Integer>
+    │       │   └── service
+    │       │       ├── MemberService.java              // 회원 서비스 인터페이스
+    │       │       └── MemberServiceImpl.java          // 회원 서비스 구현체
+    │       └── global
+    │           ├── base
+    │           │   └── BaseEntity.java                 // 생성일자·수정일자 자동 관리
+    │           ├── config
+    │           │   ├── JpaConfig.java                  // JPA 설정
+    │           │   ├── SecurityConfig.java             // Spring Security 설정 (JWT 포함)
+    │           │   └── WebConfig.java                  // CORS 등 웹 설정
+    │           ├── exception
+    │           │   ├── CoverGenerationException.java   // 표지 생성 실패 예외
+    │           │   ├── InvalidApiKeyException.java     // 잘못된/누락된 OpenAI API 키
+    │           │   ├── OrganizationAuthException.java  // 조직(Org) 권한 부족 예외
+    │           │   └── UnsupportedParameterException.java // 지원하지 않는 파라미터 예외
+    │           ├── openai
+    │           │   └── AiCoverClient.java               // OpenAI Images API 연동 클라이언트
+    │           ├── response
+    │           │   ├── CustomException.java            // 도메인별 커스텀 예외 공통 부모
+    │           │   ├── ErrorCode.java                  // 기능별 오류 코드(enum)
+    │           │   ├── GlobalExceptionHandler.java     // 전역 예외 처리기 (@RestControllerAdvice)
+    │           │   ├── Response.java                   // API 응답 표준 래퍼
+    │           │   └── SuccessCode.java                // 성공 메시지 코드(enum)
+    │           └── util
+    │               └── jwt
+    │                   ├── JwtTokenFilter.java         // JWT 인증/인가 필터
+    │                   ├── JwtTokenUtils.java          // JWT 발급/검증 유틸
+    │                   └── ResponseUtils.java          // 공통 응답 생성 유틸
+    └── resources
+        ├── static                                    
+        ├── templates                                 
+        ├── application.yml                           // 공통 설정
+        ├── application-dev.yml                       // 개발 환경 설정
+        └── application-local.yml                     // 로컬 환경 설정
+
+```
+
+</br>
+
+## 🖥️ 프로젝트 세부 구조
+### 📌 Domain → member
+회원(Member) 도메인 관련 기능을 담당합니다.
+- 주요 기능
+  - 회원 가입(Signup), 로그인(Login)
+  - JWT 기반 인증 및 세션 관리
+```
+domain/member
+├─ controller
+│   └─ MemberController.java            ▶ 회원 관련 API 제공
+│       • signup()         : 회원 가입
+│       • login()          : 로그인 (JWT 발급)
+│       • findMember()     : 회원 조회
+│
+├─ dto
+│   ├─ LoginRequest.java                 ▶ 회원 가입/로그인 요청 DTO
+│   │   • 필드: loginId, password
+│   │
+│   └─ LoginResponse.java                ▶ 회원 가입/로그인 응답 DTO
+│       • 필드: memberId
+│
+├─ entity
+│   └─ Member.java                      ▶ 회원 엔티티
+│       • 필드: id, loginId, password  
+│       • BaseEntity 상속(생성일/수정일 자동 관리)
+│
+├─ repository
+│   └─ MemberRepository.java            ▶ `JpaRepository<Member, Integer>`
+│       • 메서드: findByLoginId(String loginId) → 회원 조회
+│
+└─ service
+    ├─ MemberService.java               ▶ 회원 서비스 인터페이스
+    │   • signup(LoginRequest)            : 회원 가입 (중복 검사 후 저장)
+    │   • login(LoginRequest)             : 로그인 (ID/PW 확인 → JWT 발급)
+    │   • findMember(Integer memberId)     : 회원 조회
+    │
+    └─ MemberServiceImpl.java           ▶ 회원 서비스 구현체
+        • 비즈니스 로직 실제 구현 (중복 검사, 암호화, 토큰 생성 등)
+```
+
+### 📌 Domain → book
+도서(Book) 도메인 관련 기능을 담당합니다.
+- 주요 기능
+  - 도서 등록, 조회, 수정, 삭제
+  - 표지 이미지(AI) 생성
+```
+domain/book
+├─ controller
+│   └─ BookController.java              ▶ 도서 관련 API 제공
+│       • addBook()          : 도서 등록
+│       • findBook() / findBooks() : 도서 조회
+│       • updateBook()       : 도서 수정
+│       • deleteBook()       : 도서 삭제
+│       • generateCover()    : 도서 표지(AI) 생성
+│
+├─ controller/dto
+│   ├─ BookRequest.java                 ▶ 도서 등록/수정 요청 DTO
+│   │   • 필드: title, author, content, coverImageUrl
+│   │
+│   ├─ BookResponse.java                ▶ 도서 상세 조회 응답 DTO
+│   │   • 필드: bookId, memberId, title, author, content, createdAt, updatedAt
+│   │
+│   ├─ BookSummaryResponse.java         ▶ 도서 목록 조회 응답 DTO
+│   │   • 필드: bookId, title, author, createdAt, coverImageUrl
+│   │
+│   ├─ CoverRequest.java                ▶ 표지 이미지 생성 요청 DTO
+│   │   • 필드: title, content
+│   │
+│   └─ CoverResponse.java               ▶ 표지 이미지 생성 결과 DTO
+│       • 필드: success, message, imageUrl
+│
+├─ entity
+│   └─ Book.java                        ▶ 도서 엔티티
+│       • 필드: id, title, author, content, coverImageUrl  
+│       • 관계: 작성자(Member)와 @ManyToOne 연관관계
+│
+├─ repository
+│   └─ BookRepository.java              ▶ `JpaRepository<Book, Integer>`
+│       • 키워드(제목, 저자) 기반 검색 메서드 제공 (`findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCase`)
+│
+└─ service
+    ├─ BookService.java                 ▶ 도서 서비스 인터페이스
+    │   • findBook(Integer bookId)           : 단건 조회
+    │   • findBooks(String keyword)          : 리스트 조회 (키워드 검색)
+    │   • addBook(BookRequest, HttpSession)  : 등록
+    │   • updateBook(Integer, BookRequest, HttpSession) : 수정 (본인만 가능)
+    │   • deleteBook(Integer, HttpSession)    : 삭제 (본인만 가능)
+    │
+    └─ BookServiceImpl.java             ▶ 도서 서비스 구현체
+        • 비즈니스 로직 실제 구현 (Repository 호출, 권한 검증 등)
+```
+
+### 📌 Global(공통 영역)
+프로젝트 전반에서 사용되는 공통 기능, 설정, 예외 처리, OpenAI 연동 등을 담당합니다.
+```
+global
+├─ base
+│   └─ BaseEntity.java                  ▶ 공통 베이스 엔티티
+│       • @MappedSuperclass  
+│       • 필드: createdAt(@CreatedDate), updatedAt(@LastModifiedDate)
+│       • 모든 엔티티가 상속받아 생성/수정 일자 자동 관리
+│
+├─ openai
+│   └─ AiCoverClient.java               ▶ OpenAI Images API 호출 클라이언트
+│       • 역할: 도서 제목/내용을 받아 표지 생성 요청  
+│       • WebClient 초기화 → Bearer {API-KEY} 헤더 포함  
+│       • Prompt 구성 → 모델(dall-e-2), 크기(1024×1024) JSON 전송  
+│       • 응답 JSON → data[0].url 추출 후 반환  
+│       • 내부 DTO: OpenAiImageRequest, OpenAiImageResponse (record)
+│       • 의존성: Spring WebFlux(WebClient), Jackson
+│
+├─ response
+│   ├─ CustomException.java              ▶ 커스텀 예외 공통 부모
+│   │   • 필드: ErrorCode, message  
+│   │   • 도메인별 예외가 상속하여 사용
+│   │
+│   ├─ ErrorCode.java                    ▶ 기능별 오류 코드(enum)
+│   │   • 각 코드: HTTP 상태 + 기본 메시지  
+│   │
+│   ├─ GlobalExceptionHandler.java       ▶ 전역 예외 처리기 (@RestControllerAdvice)
+│   │   • CustomException, 검증 오류(MethodArgumentNotValidException) 등 처리  
+│   │
+│   ├─ Response.java                      ▶ API 응답 표준 래퍼
+│   │   • success(), error() 팩토리 메서드 제공  
+│   │   • 공통 응답 JSON 구조 통일
+│   │
+│   └─ SuccessCode.java                   ▶ 성공 메시지 코드(enum)
+│       • OK(200, "성공입니다") 등 재사용 가능한 성공 메시지
+│
+└─ util
+    └─ jwt
+        ├─ JwtTokenFilter.java             ▶ JWT 인증/인가 필터
+        │   • 요청 헤더의 Bearer 토큰 검증  
+        │   • 유효 시 SecurityContext에 인증 정보 저장
+        │
+        ├─ JwtTokenUtils.java              ▶ JWT 유틸리티 클래스
+        │   • AccessToken / RefreshToken 생성  
+        │   • 토큰 검증, 만료 시간 설정 등
+        │
+        └─ ResponseUtils.java              ▶ 공통 응답 생성 유틸
+            • 컨트롤러에서 간단하게 `Response.success(...)` 호출 가능
+```
